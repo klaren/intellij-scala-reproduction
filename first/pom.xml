@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+  
+    <groupId>org.example</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Parent pom</name>
+
+    <modules>
+        <module>modules</module>
+    </modules>
+
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <scala-maven-plugin.version>4.8.1</scala-maven-plugin.version>
+        <scala.version>2.13.11</scala.version>
+        <scala.binary.version>2.13</scala.binary.version>
+        <scala.plugin.recompileMode>all</scala.plugin.recompileMode>
+        <scala.target.vm>17</scala.target.vm>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Default scala compile settings -->
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <version>${scala-maven-plugin.version}</version>
+
+                    <configuration>
+                        <scalaVersion>${scala.version}</scalaVersion>
+                        <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+                        <recompileMode>${scala.plugin.recompileMode}</recompileMode>
+                        <args>
+                            <arg>-Xlint:_,-missing-interpolator</arg>
+                            <arg>-target:jvm-${scala.target.vm}</arg>
+                            <arg>-nobootcp</arg>
+                            <!-- We need to be able to deprecate APIs and have some time for all teams to adapt. -->
+                            <arg>-Wconf:cat=deprecation:is</arg>
+                        </args>
+                        <jvmArgs>
+                            <jvmArg>-Xms256m</jvmArg>
+                            <jvmArg>-Xmx1024m</jvmArg>
+                            <jvmArg>-Xss4M</jvmArg>
+                        </jvmArgs>
+                        <secondaryCacheDir>${java.io.tmpdir}</secondaryCacheDir>
+                    </configuration>
+
+                    <!-- This is needed to mix scala and java code in the same module -->
+                    <executions>
+                        <execution>
+                            <id>scala-compile</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- scala -->
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
